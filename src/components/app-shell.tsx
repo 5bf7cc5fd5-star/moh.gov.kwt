@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const consoleMode = pathname.startsWith("/admin");
+  const consoleMode = pathname.startsWith("/admin") || pathname.startsWith("/login");
 
   if (consoleMode) {
     return <div className="min-h-dvh bg-page">{children}</div>;
