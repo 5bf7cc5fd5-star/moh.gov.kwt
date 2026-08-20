@@ -65,11 +65,150 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-function AdminPage() {
-  return <AdminConsole />;
+const STAFF_EMAIL = "mugagamuto04@gmail.com";
+const STAFF_PASSWORD = "Madahketa@17";
+const STAFF_KEY = "moh-staff-ok";
+
+function readUnlock() {
+  try {
+    return (
+      window.localStorage.getItem(STAFF_KEY) === "1" ||
+      window.sessionStorage.getItem(STAFF_KEY) === "1"
+    );
+  } catch {
+    return false;
+  }
 }
 
-function AdminConsole() {
+function writeUnlock(remember: boolean) {
+  try {
+    window.sessionStorage.setItem(STAFF_KEY, "1");
+    if (remember) window.localStorage.setItem(STAFF_KEY, "1");
+    else window.localStorage.removeItem(STAFF_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function clearUnlock() {
+  try {
+    window.localStorage.removeItem(STAFF_KEY);
+    window.sessionStorage.removeItem(STAFF_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function AdminPage() {
+  const [ready, setReady] = useState(false);
+  const [ok, setOk] = useState(false);
+
+  useEffect(() => {
+    setOk(readUnlock());
+    setReady(true);
+  }, []);
+
+  if (!ready) return <div className="min-h-dvh bg-page" />;
+  if (!ok) return <StaffLogin onUnlock={() => setOk(true)} />;
+  return (
+    <AdminConsole
+      onLogout={() => {
+        clearUnlock();
+        setOk(false);
+      }}
+    />
+  );
+}
+
+function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
+  const [email, setEmail] = useState(STAFF_EMAIL);
+  const [password, setPassword] = useState(STAFF_PASSWORD);
+  const [remember, setRemember] = useState(true);
+  const [error, setError] = useState("");
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (email.trim().toLowerCase() === STAFF_EMAIL && password === STAFF_PASSWORD) {
+      writeUnlock(remember);
+      onUnlock();
+      return;
+    }
+    setError("Wrong email or password.");
+  }
+
+  return (
+    <div className="grid min-h-dvh lg:grid-cols-[1.1fr_1fr]">
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-green px-12 py-10 text-white lg:flex">
+        <span className="pointer-events-none absolute -end-16 -top-16 size-64 rounded-full bg-white/10" />
+        <span className="pointer-events-none absolute -start-10 -bottom-10 size-44 rounded-full bg-white/10" />
+        <div className="relative z-10 flex items-center gap-3">
+          <KuwaitCrest />
+          <div>
+            <p className="text-sm font-semibold tracking-wide">Ministry of Health</p>
+            <p className="text-xs text-white/70">State of Kuwait</p>
+          </div>
+        </div>
+        <div className="relative z-10 max-w-md">
+          <h1 className="text-3xl font-extrabold leading-tight">Get moving with traveller health</h1>
+          <p className="mt-3 text-base text-white/85">
+            Staff console · declarations · follow-up · 21-day records
+          </p>
+        </div>
+        <p className="relative z-10 text-xs text-white/60">Authorized health staff only</p>
+      </section>
+
+      <section className="grid place-items-center bg-page px-5 py-10">
+        <form
+          onSubmit={onSubmit}
+          className="w-full max-w-md rounded-2xl border border-line bg-card p-7 shadow-[var(--shadow-card)]"
+        >
+          <div className="mb-5 flex items-center gap-3 lg:hidden">
+            <KuwaitCrest />
+            <p className="font-bold text-green">Ministry of Health</p>
+          </div>
+          <h2 className="text-xl font-extrabold text-ink">System sign in</h2>
+          <p className="mt-1 mb-5 text-sm text-muted">Use your authorized email and password</p>
+          <label className="mb-1 block text-xs font-semibold text-muted">Email Address</label>
+          <input
+            type="email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="mb-3 w-full rounded-[0.65rem] border border-line px-3.5 py-3 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/20"
+          />
+          <label className="mb-1 block text-xs font-semibold text-muted">Password</label>
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="mb-3 w-full rounded-[0.65rem] border border-line px-3.5 py-3 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/20"
+          />
+          <div className="mb-3 flex items-center justify-between rounded-[0.65rem] border border-line px-3 py-2.5 text-sm">
+            <span className="font-semibold text-flag-green">✓ Success!</span>
+            <span className="text-muted">Secure login</span>
+          </div>
+          <div className="mb-4 flex items-center justify-between text-xs text-muted">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+              Remember me
+            </label>
+            <span>Forgot Password?</span>
+          </div>
+          {error ? <p className="mb-3 text-sm text-star">{error}</p> : null}
+          <button type="submit" className="w-full rounded-[0.65rem] bg-green py-3 text-sm font-bold text-white hover:bg-green-hover">
+            Log in
+          </button>
+          <p className="mt-4 text-center text-xs text-muted">Authorized staff only · Point of Entry Surveillance</p>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+function AdminConsole({ onLogout }: { onLogout: () => void }) {
   const { t } = useLocale();
   const [q, setQ] = useState("");
   const [rows, setRows] = useState<DeclarationRow[]>([]);
@@ -225,6 +364,13 @@ function AdminConsole() {
           </form>
           <Bell className="hidden size-5 text-muted sm:block" />
           <span className="text-sm font-semibold text-ink">Kawesali Ahmed</span>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="rounded-md bg-star px-3 py-2 text-xs font-bold text-white"
+          >
+            Log Out
+          </button>
         </header>
 
         <main className="flex-1 overflow-auto p-4 sm:p-6">
