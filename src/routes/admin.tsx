@@ -99,7 +99,7 @@ function clearUnlock() {
   }
 }
 
-function AdminPage() {
+export function AdminPage() {
   const [ready, setReady] = useState(false);
   const [ok, setOk] = useState(false);
 
@@ -137,10 +137,8 @@ function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
   }
 
   return (
-    <div className="grid min-h-dvh lg:grid-cols-[1.1fr_1fr]">
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-green px-12 py-10 text-white lg:flex">
-        <span className="pointer-events-none absolute -end-16 -top-16 size-64 rounded-full bg-white/10" />
-        <span className="pointer-events-none absolute -start-10 -bottom-10 size-44 rounded-full bg-white/10" />
+    <div className="login-wrap">
+      <div className="login-hero">
         <div className="relative z-10 flex items-center gap-3">
           <KuwaitCrest />
           <div>
@@ -148,49 +146,45 @@ function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
             <p className="text-xs text-white/70">State of Kuwait</p>
           </div>
         </div>
-        <div className="relative z-10 max-w-md">
-          <h1 className="text-3xl font-extrabold leading-tight">Get moving with traveller health</h1>
-          <p className="mt-3 text-base text-white/85">
-            Staff console · declarations · follow-up · 21-day records
-          </p>
+        <div className="relative z-10">
+          <p className="hero-title">Get moving with traveller health</p>
+          <p className="hero-sub">Staff console · declarations · follow-up · 21-day records</p>
         </div>
-        <p className="relative z-10 text-xs text-white/60">Authorized health staff only</p>
-      </section>
-
-      <section className="grid place-items-center bg-page px-5 py-10">
-        <form
-          onSubmit={onSubmit}
-          className="w-full max-w-md rounded-2xl border border-line bg-card p-7 shadow-[var(--shadow-card)]"
-        >
-          <div className="mb-5 flex items-center gap-3 lg:hidden">
+        <p className="relative z-10 text-xs text-white/70">Authorized health staff only</p>
+      </div>
+      <div className="login-panel">
+        <form onSubmit={onSubmit} className="login-card">
+          <div className="mb-4 flex items-center gap-2">
             <KuwaitCrest />
-            <p className="font-bold text-green">Ministry of Health</p>
+            <p className="font-bold" style={{ color: "#1e3a8a" }}>Ministry of Health</p>
           </div>
-          <h2 className="text-xl font-extrabold text-ink">System sign in</h2>
-          <p className="mt-1 mb-5 text-sm text-muted">Use your authorized email and password</p>
-          <label className="mb-1 block text-xs font-semibold text-muted">Email Address</label>
-          <input
-            type="email"
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="mb-3 w-full rounded-[0.65rem] border border-line px-3.5 py-3 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/20"
-          />
-          <label className="mb-1 block text-xs font-semibold text-muted">Password</label>
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="mb-3 w-full rounded-[0.65rem] border border-line px-3.5 py-3 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/20"
-          />
-          <div className="mb-3 flex items-center justify-between rounded-[0.65rem] border border-line px-3 py-2.5 text-sm">
-            <span className="font-semibold text-flag-green">✓ Success!</span>
-            <span className="text-muted">Secure login</span>
+          <h1>System sign in</h1>
+          <p className="mb-4 text-xs text-muted">Use your authorized email and password</p>
+          <div className="login-field">
+            <label>Email Address</label>
+            <input
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+            />
           </div>
-          <div className="mb-4 flex items-center justify-between text-xs text-muted">
+          <div className="login-field">
+            <label>Password</label>
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+          </div>
+          <div className="captcha-box">
+            <div className="ok">✓ Success!</div>
+            <div className="text-muted">Secure login</div>
+          </div>
+          <div className="login-meta">
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
               Remember me
@@ -198,12 +192,12 @@ function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
             <span>Forgot Password?</span>
           </div>
           {error ? <p className="mb-3 text-sm text-star">{error}</p> : null}
-          <button type="submit" className="w-full rounded-[0.65rem] bg-green py-3 text-sm font-bold text-white hover:bg-green-hover">
+          <button type="submit" className="btn-login">
             Log in
           </button>
           <p className="mt-4 text-center text-xs text-muted">Authorized staff only · Point of Entry Surveillance</p>
         </form>
-      </section>
+      </div>
     </div>
   );
 }

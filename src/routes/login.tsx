@@ -1,9 +1,8 @@
 "use client";
 
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { AdminPage } from "./admin";
 
 export const Route = createFileRoute("/login")({
-  component: function LoginRedirect() {
-    return <Navigate to="/admin" />;
-  },
+  component: AdminPage,
 });
