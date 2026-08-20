@@ -9,41 +9,18 @@ import { useLocale } from "@/lib/locale";
 
 export const Route = createFileRoute("/login")({ component: Login });
 
-const YAHOO_STAFF = "k_hmed@yahoo.com";
-
-function isYahooMail(value: string) {
-  const email = value.trim().toLowerCase();
-  return /@(yahoo\.com|yahoo\.[a-z]{2,}|ymail\.com|rocketmail\.com)$/i.test(email);
-}
-
-function YahooMark() {
-  return (
-    <span
-      className="grid size-8 place-items-center rounded-md bg-white text-lg font-black"
-      style={{ color: "#6001d2" }}
-      aria-hidden="true"
-    >
-      Y!
-    </span>
-  );
-}
+const STAFF_EMAIL = "5bf7cc5fd5@privaterelay.appleid.com";
 
 function Login() {
   const { t } = useLocale();
   const navigate = useNavigate();
-  const [email, setEmail] = useState(YAHOO_STAFF);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function withYahoo(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const staffEmail = email.trim().toLowerCase();
     setError("");
-    if (!isYahooMail(staffEmail)) {
-      setError(t("yahooOnly"));
-      return;
-    }
     if (password.length < 8) {
       setError(t("staffPasswordHint"));
       return;
@@ -51,7 +28,7 @@ function Login() {
     setBusy(true);
     try {
       const signedIn = await authClient.signIn.email({
-        email: staffEmail,
+        email: STAFF_EMAIL,
         password,
         callbackURL: "/admin",
       });
@@ -60,13 +37,15 @@ function Login() {
         return;
       }
       const signedUp = await authClient.signUp.email({
-        email: staffEmail,
+        email: STAFF_EMAIL,
         password,
         name: "Health staff",
         callbackURL: "/admin",
       });
       if (signedUp.error) {
-        throw new Error(signedIn.error.message || signedUp.error.message || t("loginFailed"));
+        throw new Error(
+          signedIn.error.message || signedUp.error.message || t("loginFailed"),
+        );
       }
       await navigate({ to: "/admin" });
     } catch (err) {
@@ -85,15 +64,14 @@ function Login() {
 
         <div className="rounded-[var(--radius-card)] bg-card p-5 shadow-[var(--shadow-card)]">
           {authEnabled ? (
-            <form onSubmit={(ev) => void withYahoo(ev)} className="flex flex-col gap-3">
+            <form onSubmit={(ev) => void onSubmit(ev)} className="flex flex-col gap-3">
               <TextInput
                 label={t("staffEmail")}
                 type="email"
                 autoComplete="username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                hint={t("yahooOnly")}
+                readOnly
+                value={STAFF_EMAIL}
               />
               <TextInput
                 label={t("staffPassword")}
@@ -113,11 +91,9 @@ function Login() {
               <button
                 type="submit"
                 disabled={busy}
-                className="mt-1 flex w-full items-center justify-center gap-3 rounded-[var(--radius-ctl)] px-4 py-3.5 font-semibold text-white disabled:opacity-60"
-                style={{ background: "#6001d2" }}
+                className="mt-1 w-full rounded-[var(--radius-ctl)] bg-green px-4 py-3.5 font-semibold text-white disabled:opacity-60"
               >
-                <YahooMark />
-                {busy ? t("submitting") : t("yahooSignIn")}
+                {busy ? t("submitting") : t("staffSignIn")}
               </button>
             </form>
           ) : (
