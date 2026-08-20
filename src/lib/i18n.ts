@@ -218,6 +218,17 @@ const en = {
   emailSent: "A copy of this declaration was emailed to k_hmed@yahoo.com and to the email you entered.",
   emailNotSent: "The declaration is saved, but the email copy was not delivered yet. Open Yahoo (including Junk) and click Confirm in the FormSubmit message, then submit one more test.",
   emailActivate: "First report: confirm FormSubmit in your Yahoo inbox, then later submissions will arrive automatically.",
+  adminConsole: "Staff console",
+  dashWelcome: "Welcome",
+  dashLead: "Traveller declarations from the last 21 days.",
+  dashGeneral: "General",
+  dashDay: "Day",
+  dashWeek: "Week",
+  dashMonth: "Month",
+  dashRetention: "Every declaration is stored for 21 days, then deleted automatically.",
+  dashRetentionShort: "21-day retention",
+  dashViewReport: "View list",
+  dashClearRate: "Clear rate",
 };
 
 export type Msg = keyof typeof en;
@@ -430,6 +441,17 @@ const ar: Record<Msg, string> = {
   emailSent: "أُرسلت نسخة من هذا الإقرار إلى k_hmed@yahoo.com وإلى البريد الذي أدخلته.",
   emailNotSent: "حُفظ الإقرار، لكن نسخة البريد لم تصل بعد. افتح ياهو (بما فيه البريد غير المرغوب) واضغط تأكيد في رسالة FormSubmit، ثم أرسل اختباراً آخر.",
   emailActivate: "أول تقرير: أكّد FormSubmit في بريد ياهو، ثم تصل التقارير التالية تلقائياً.",
+  adminConsole: "لوحة الموظفين",
+  dashWelcome: "مرحباً",
+  dashLead: "إقرارات المسافرين خلال آخر ٢١ يوماً.",
+  dashGeneral: "عام",
+  dashDay: "يوم",
+  dashWeek: "أسبوع",
+  dashMonth: "شهر",
+  dashRetention: "يُحفظ كل إقرار لمدة ٢١ يوماً ثم يُحذف تلقائياً.",
+  dashRetentionShort: "حفظ ٢١ يوماً",
+  dashViewReport: "عرض القائمة",
+  dashClearRate: "نسبة السليم",
 };
 
 export const DICTS: Record<Locale, Record<Msg, string>> = { en, ar };

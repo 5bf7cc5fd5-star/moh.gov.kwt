@@ -261,6 +261,7 @@ export const submitDeclaration = createServerFn({ method: "POST" })
             ${data.locale}
           )
         `;
+        await purgeExpired(sql);
         const emailed = await sendDeclarationEmail(code, riskFlag, data);
         return { code, riskFlag, emailed };
       } catch (err) {
@@ -275,6 +276,12 @@ export const submitDeclaration = createServerFn({ method: "POST" })
     }
     throw new Error("Could not assign a unique code");
   });
+
+export const RETENTION_DAYS = 21;
+
+async function purgeExpired(sql: Awaited<ReturnType<typeof getSql>>) {
+  await sql`delete from declarations where created_at < now() - interval '21 days'`;
+}
 
 export const getDeclarationByCode = createServerFn({ method: "GET" })
   .validator((code: string) => code.trim().toUpperCase())
@@ -291,20 +298,27 @@ export const searchDeclarations = createServerFn({ method: "GET" })
   .validator((q: string) => q.trim())
   .handler(async ({ data: q }) => {
     const sql = await getSql();
+    await purgeExpired(sql);
     if (!q) {
       return sql<DeclarationRow>`
-        select * from declarations order by created_at desc limit 80
+        select * from declarations
+        where created_at >= now() - interval '21 days'
+        order by created_at desc
+        limit 400
       `;
     }
     const like = `%${q}%`;
     return sql<DeclarationRow>`
       select * from declarations
-      where code ilike ${like}
-         or full_name ilike ${like}
-         or passport_number ilike ${like}
-         or civil_id ilike ${like}
-         or flight_number ilike ${like}
+      where created_at >= now() - interval '21 days'
+        and (
+          code ilike ${like}
+          or full_name ilike ${like}
+          or passport_number ilike ${like}
+          or civil_id ilike ${like}
+          or flight_number ilike ${like}
+        )
       order by created_at desc
-      limit 80
+      limit 400
     `;
   });

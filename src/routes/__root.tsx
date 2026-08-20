@@ -1,9 +1,8 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { AppShell } from "@/components/app-shell";
 import { LocaleProvider } from "@/lib/locale";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { publicShareHost } from "@/lib/og/public-host";
 import appCss from "../styles.css?url";
 
@@ -55,11 +54,9 @@ function RootDocument() {
         <PreviewHostBridge />
         <AuthProvider>
           <LocaleProvider>
-            <div className="flex min-h-dvh flex-col">
-              <SiteHeader />
+            <AppShell>
               <Outlet />
-              <SiteFooter />
-            </div>
+            </AppShell>
           </LocaleProvider>
         </AuthProvider>
         <Scripts />

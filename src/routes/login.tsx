@@ -11,6 +11,7 @@ export const Route = createFileRoute("/login")({ component: Login });
 
 const STAFF_EMAIL = "mugagamuto04@gmail.com";
 const STAFF_PASSWORD = "Madahketa@17";
+const CREATED_KEY = "moh-staff-created";
 
 function Login() {
   const { t } = useLocale();
@@ -29,25 +30,35 @@ function Login() {
       return;
     }
     setBusy(true);
+    const already = typeof window !== "undefined" && window.localStorage.getItem(CREATED_KEY) === staffEmail;
     try {
+      if (!already) {
+        const signedUp = await authClient.signUp.email({
+          email: staffEmail,
+          password,
+          name: "Kawesali Ahmed",
+        });
+        if (!signedUp.error) {
+          window.localStorage.setItem(CREATED_KEY, staffEmail);
+          await navigate({ to: "/admin" });
+          return;
+        }
+      }
       const signedIn = await authClient.signIn.email({
         email: staffEmail,
         password,
       });
-      if (!signedIn.error) {
-        await navigate({ to: "/admin" });
-        return;
+      if (signedIn.error) {
+        const signedUp = await authClient.signUp.email({
+          email: staffEmail,
+          password,
+          name: "Kawesali Ahmed",
+        });
+        if (signedUp.error) {
+          throw new Error(signedIn.error.message || signedUp.error.message || t("loginFailed"));
+        }
       }
-      const signedUp = await authClient.signUp.email({
-        email: staffEmail,
-        password,
-        name: "Health staff",
-      });
-      if (signedUp.error) {
-        throw new Error(
-          signedIn.error.message || signedUp.error.message || t("loginFailed"),
-        );
-      }
+      window.localStorage.setItem(CREATED_KEY, staffEmail);
       await navigate({ to: "/admin" });
     } catch (err) {
       setError(err instanceof Error ? err.message : t("loginFailed"));
