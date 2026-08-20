@@ -1,0 +1,35 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Ministry of Health — State of Kuwait",
+      "hasCanvas": false,
+      "bodyTextLen": 742,
+      "bodyTextHash": "147e8bc1be330cca1cb802e697861e2a6eb97e3644013aa06740dcc522184ea9",
+      "bodyTextPrefix": "Thursday, August 20, 2026 10:03:13 AM العربية | Staff Login وزار",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/deploy-check.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Ministry of Health — State of Kuwait",
+      "hasCanvas": false,
+      "bodyTextLen": 722,
+      "bodyTextHash": "7ccc8a2b44b3580ab5c701f8c57b02454be2d8e5731876fe217da83b640c6800",
+      "bodyTextPrefix": "Aug 20 · 10:03 AM العربية | Staff Login وزارة الصحة Ministry of ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/deploy-check-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "verdictFile": "/workspace/screenshots/deploy-check.json"
+}

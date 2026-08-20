@@ -1,1 +1,0 @@
-import{l as e}from"./locale-he0W_Buy.js";import{t}from"./page-frame-79KcqAHI.js";import{t as n}from"./declaration-form-Cri15Rxr.js";var r=e();function i(){return(0,r.jsx)(t,{children:(0,r.jsx)(n,{direction:`arrive`})})}export{i as component};
