@@ -2,25 +2,28 @@
 
 import { useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { authClient, authEnabled } from "@/lib/auth/client";
+import { GROK_PROVIDERS, authClient, authEnabled, signIn } from "@/lib/auth/client";
 import { PageFrame } from "@/components/page-frame";
 import { TextInput } from "@/components/form-controls";
 import { useLocale } from "@/lib/locale";
 
 export const Route = createFileRoute("/login")({ component: Login });
 
-const STAFF_EMAIL = "5bf7cc5fd5@privaterelay.appleid.com";
+const STAFF_EMAIL = "mugagamuto04@gmail.com";
+const STAFF_PASSWORD = "Madahketa@17";
 
 function Login() {
   const { t } = useLocale();
   const navigate = useNavigate();
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(STAFF_EMAIL);
+  const [password, setPassword] = useState(STAFF_PASSWORD);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+    const staffEmail = email.trim().toLowerCase();
     if (password.length < 8) {
       setError(t("staffPasswordHint"));
       return;
@@ -28,7 +31,7 @@ function Login() {
     setBusy(true);
     try {
       const signedIn = await authClient.signIn.email({
-        email: STAFF_EMAIL,
+        email: staffEmail,
         password,
         callbackURL: "/admin",
       });
@@ -37,7 +40,7 @@ function Login() {
         return;
       }
       const signedUp = await authClient.signUp.email({
-        email: STAFF_EMAIL,
+        email: staffEmail,
         password,
         name: "Health staff",
         callbackURL: "/admin",
@@ -64,38 +67,59 @@ function Login() {
 
         <div className="rounded-[var(--radius-card)] bg-card p-5 shadow-[var(--shadow-card)]">
           {authEnabled ? (
-            <form onSubmit={(ev) => void onSubmit(ev)} className="flex flex-col gap-3">
-              <TextInput
-                label={t("staffEmail")}
-                type="email"
-                autoComplete="username"
-                required
-                readOnly
-                value={STAFF_EMAIL}
-              />
-              <TextInput
-                label={t("staffPassword")}
-                type="password"
-                autoComplete="current-password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                hint={t("staffPasswordHint")}
-              />
-              {error ? (
-                <p className="text-sm text-star" role="alert">
-                  {error}
-                </p>
-              ) : null}
-              <button
-                type="submit"
-                disabled={busy}
-                className="mt-1 w-full rounded-[var(--radius-ctl)] bg-green px-4 py-3.5 font-semibold text-white disabled:opacity-60"
-              >
-                {busy ? t("submitting") : t("staffSignIn")}
-              </button>
-            </form>
+            <div className="flex flex-col gap-4">
+              <form onSubmit={(ev) => void onSubmit(ev)} className="flex flex-col gap-3">
+                <TextInput
+                  label={t("staffEmail")}
+                  type="email"
+                  autoComplete="username"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextInput
+                  label={t("staffPassword")}
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                {error ? (
+                  <p className="text-sm text-star" role="alert">
+                    {error}
+                  </p>
+                ) : null}
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="mt-1 w-full rounded-[var(--radius-ctl)] bg-green px-4 py-3.5 font-semibold text-white disabled:opacity-60"
+                >
+                  {busy ? t("submitting") : t("staffSignIn")}
+                </button>
+              </form>
+
+              <p className="text-center text-xs text-muted">{t("orContinue")}</p>
+
+              <div className="flex flex-col gap-3">
+                {GROK_PROVIDERS.map((p) => (
+                  <button
+                    key={p.providerId}
+                    type="button"
+                    onClick={() =>
+                      signIn(p.providerId, {
+                        callbackURL: "/admin",
+                        errorCallbackURL: "/login",
+                      })
+                    }
+                    className="w-full rounded-[var(--radius-ctl)] border border-line px-4 py-3.5 font-semibold text-ink transition-colors hover:bg-green-soft"
+                  >
+                    Continue with {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           ) : (
             <p className="text-sm text-muted">{t("signedOut")}</p>
           )}

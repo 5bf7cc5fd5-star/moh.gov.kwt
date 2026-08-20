@@ -156,7 +156,7 @@ const en = {
   verifyCta: "Look up",
   notFound: "No declaration found for that code.",
   loginTitle: "Health staff sign in",
-  loginLead: "Sign in with your Apple Hide My Email address to look up traveller declarations.",
+  loginLead: "Sign in with mugagamuto04@gmail.com to look up traveller declarations.",
   adminTitle: "Declarations",
   searchPlaceholder: "Search name, passport, Civil ID or code",
   reportsEmail:
@@ -370,7 +370,7 @@ const ar: Record<Msg, string> = {
   verifyCta: "بحث",
   notFound: "لا يوجد إقرار بهذا الرمز.",
   loginTitle: "تسجيل دخول الموظفين",
-  loginLead: "سجّل الدخول ببريد آبل المخفي للاطلاع على إقرارات المسافرين.",
+  loginLead: "سجّل الدخول بـ mugagamuto04@gmail.com للاطلاع على إقرارات المسافرين.",
   adminTitle: "الإقرارات",
   searchPlaceholder: "بحث بالاسم أو الجواز أو الرقم المدني أو الرمز",
   reportsEmail:
