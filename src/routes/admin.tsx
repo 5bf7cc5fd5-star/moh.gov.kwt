@@ -121,8 +121,8 @@ export function AdminPage() {
 }
 
 function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
-  const [email, setEmail] = useState(STAFF_EMAIL);
-  const [password, setPassword] = useState(STAFF_PASSWORD);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
 
