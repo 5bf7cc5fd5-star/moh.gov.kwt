@@ -165,7 +165,7 @@ export function SiteHeader() {
             className="flex min-w-0 items-center gap-3 text-white no-underline sm:gap-4"
             aria-label={t("brandLine")}
           >
-            <KuwaitCrest className="size-[3.85rem] shrink-0 rounded-full object-cover ring-1 ring-white/25 sm:size-[4.75rem]" />
+            <KuwaitCrest className="size-[3.85rem] sm:size-[4.75rem]" />
             <span className="min-w-0">
               <span className="block font-display text-lg font-extrabold leading-[1.15] sm:text-xl">
                 {t("mohArabic")}
