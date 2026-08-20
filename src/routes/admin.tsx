@@ -29,6 +29,7 @@ import {
   type DeclarationRow,
   type Screening,
 } from "@/lib/declarations";
+import { verifyStaffLogin } from "@/lib/staff-auth";
 import { useLocale } from "@/lib/locale";
 
 export const Route = createFileRoute("/admin")({ component: AdminPage });
@@ -65,8 +66,6 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-const STAFF_EMAIL = "mugagamuto04@gmail.com";
-const STAFF_PASSWORD = "Madahketa@17";
 const STAFF_KEY = "moh-staff-ok";
 
 function readUnlock() {
@@ -125,15 +124,25 @@ function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (email.trim().toLowerCase() === STAFF_EMAIL && password === STAFF_PASSWORD) {
+    setError("");
+    setBusy(true);
+    try {
+      const result = await verifyStaffLogin({ data: { email, password } });
+      if (!result.ok) {
+        setError("Wrong email or password.");
+        setBusy(false);
+        return;
+      }
       writeUnlock(remember);
       onUnlock();
-      return;
+    } catch {
+      setError("Could not sign in. Try again.");
+      setBusy(false);
     }
-    setError("Wrong email or password.");
   }
 
   return (
@@ -164,7 +173,7 @@ function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
             <label>Email Address</label>
             <input
               type="email"
-              autoComplete="username"
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
@@ -174,7 +183,7 @@ function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
             <label>Password</label>
             <input
               type="password"
-              autoComplete="current-password"
+              autoComplete="off"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
@@ -192,8 +201,8 @@ function StaffLogin({ onUnlock }: { onUnlock: () => void }) {
             <span>Forgot Password?</span>
           </div>
           {error ? <p className="mb-3 text-sm text-star">{error}</p> : null}
-          <button type="submit" className="btn-login">
-            Log in
+          <button type="submit" className="btn-login" disabled={busy}>
+            {busy ? "Signing in…" : "Log in"}
           </button>
           <p className="mt-4 text-center text-xs text-muted">Authorized staff only · Point of Entry Surveillance</p>
         </form>
