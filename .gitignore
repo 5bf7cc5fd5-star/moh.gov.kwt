@@ -8,3 +8,7 @@ node_modules/
 dist/
 .nitro/
 .tanstack/
+
+artifacts/
+screenshots/
+attachments/
