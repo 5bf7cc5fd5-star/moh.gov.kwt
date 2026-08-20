@@ -8,7 +8,7 @@ import {
   type DeclarationInput,
   type Direction,
 } from "@/lib/declarations";
-import { sendDeclarationEmail } from "@/lib/report-email";
+import { sendDeclarationEmailDetailed } from "@/lib/report-email";
 import { useLocale } from "@/lib/locale";
 import type { Msg } from "@/lib/i18n";
 import {
@@ -249,12 +249,21 @@ export function DeclarationForm({ direction }: { direction: Direction }) {
     setBusy(true);
     try {
       const result = await submitDeclaration({ data: payload });
-      if (!result.emailed) {
-        void sendDeclarationEmail(result.code, result.riskFlag, payload);
+      let emailed = result.emailed;
+      let emailDetail = emailed ? "sent" : "";
+      if (!emailed) {
+        const retry = await sendDeclarationEmailDetailed(
+          result.code,
+          result.riskFlag,
+          payload,
+        );
+        emailed = retry.ok;
+        emailDetail = retry.detail;
       }
       await navigate({
         to: "/declare/done/$code",
         params: { code: result.code },
+        search: { emailed: emailed ? "1" : "0", why: emailDetail },
       });
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Could not submit.");

@@ -3,6 +3,8 @@ import type { DeclarationInput, Screening } from "@/lib/declarations";
 
 export const REPORT_INBOX = "k_hmed@yahoo.com";
 
+export type EmailSendResult = { ok: boolean; detail: string };
+
 function yn(v: boolean | null | undefined) {
   if (v === true) return "Yes";
   if (v === false) return "No";
@@ -91,25 +93,40 @@ export function buildReportFields(
   };
 }
 
-export async function sendDeclarationEmail(
+function buildBody(
   code: string,
   riskFlag: boolean,
   data: DeclarationInput,
-): Promise<boolean> {
+): Record<string, string> {
   const fields = buildReportFields(code, riskFlag, data);
   const subject = `Health declaration ${code} — ${riskFlag ? "FOLLOW-UP" : "clear"} — ${data.fullName}`;
+  const traveller = data.email?.trim();
   const body: Record<string, string> = {
     _subject: subject,
     _template: "table",
     _captcha: "false",
+    name: data.fullName,
+    email: traveller || REPORT_INBOX,
     ...fields,
   };
-  if (data.email) body._replyto = data.email;
+  if (traveller) {
+    body._replyto = traveller;
+    if (traveller.toLowerCase() !== REPORT_INBOX.toLowerCase()) {
+      body._cc = traveller;
+    }
+    body._autoresponse = `Your Kuwait Ministry of Health traveller declaration was received. Reference ${code}. Show this code at the health desk.`;
+  }
+  return body;
+}
 
+async function postFormSubmit(
+  inbox: string,
+  body: Record<string, string>,
+): Promise<EmailSendResult> {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 6000);
+  const timer = setTimeout(() => ctrl.abort(), 12000);
   try {
-    const res = await fetch(`https://formsubmit.co/ajax/${REPORT_INBOX}`, {
+    const res = await fetch(`https://formsubmit.co/ajax/${inbox}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -120,13 +137,41 @@ export async function sendDeclarationEmail(
       keepalive: true,
     });
     const json = (await res.json().catch(() => null)) as
-      | { success?: string | boolean }
+      | { success?: string | boolean; message?: string }
       | null;
-    const okFlag = json?.success;
-    return res.ok && okFlag !== false && okFlag !== "false";
-  } catch {
-    return false;
+    const raw = json?.success;
+    const ok = res.ok && raw !== false && raw !== "false";
+    const detail = String(json?.message ?? (ok ? "sent" : `HTTP ${res.status}`));
+    return { ok, detail };
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : "network error";
+    return { ok: false, detail };
   } finally {
     clearTimeout(timer);
   }
+}
+
+export async function sendDeclarationEmailDetailed(
+  code: string,
+  riskFlag: boolean,
+  data: DeclarationInput,
+): Promise<EmailSendResult> {
+  const body = buildBody(code, riskFlag, data);
+  const primary = await postFormSubmit(REPORT_INBOX, body);
+  if (primary.ok) return primary;
+  const traveller = data.email?.trim();
+  if (traveller && traveller.toLowerCase() !== REPORT_INBOX.toLowerCase()) {
+    const copy = await postFormSubmit(traveller, body);
+    if (copy.ok) return copy;
+  }
+  return primary;
+}
+
+export async function sendDeclarationEmail(
+  code: string,
+  riskFlag: boolean,
+  data: DeclarationInput,
+): Promise<boolean> {
+  const result = await sendDeclarationEmailDetailed(code, riskFlag, data);
+  return result.ok;
 }

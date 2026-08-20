@@ -205,6 +205,16 @@ const en = {
   backHome: "Back to e-services",
   openService: "Open service",
   brandLine: "Ministry of Health — State of Kuwait",
+  staffEmail: "Staff email",
+  staffPassword: "Password",
+  staffPasswordHint: "At least 8 characters. First time here? tap Create staff account.",
+  staffSignIn: "Sign in with email",
+  staffCreate: "Create staff account",
+  orContinue: "or",
+  loginFailed: "Could not sign in. Check the email and password.",
+  emailSent: "A copy of this declaration was emailed to k_hmed@yahoo.com and to the email you entered.",
+  emailNotSent: "The declaration is saved, but the email copy was not delivered yet. Open Yahoo (including Junk) and click Confirm in the FormSubmit message, then submit one more test.",
+  emailActivate: "First report: confirm FormSubmit in your Yahoo inbox, then later submissions will arrive automatically.",
 };
 
 export type Msg = keyof typeof en;
@@ -404,6 +414,16 @@ const ar: Record<Msg, string> = {
   backHome: "العودة إلى الخدمات الإلكترونية",
   openService: "فتح الخدمة",
   brandLine: "وزارة الصحة — دولة الكويت",
+  staffEmail: "بريد الموظف",
+  staffPassword: "كلمة المرور",
+  staffPasswordHint: "٨ أحرف على الأقل. أول مرة؟ اضغط إنشاء حساب موظف.",
+  staffSignIn: "دخول بالبريد",
+  staffCreate: "إنشاء حساب موظف",
+  orContinue: "أو",
+  loginFailed: "تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور.",
+  emailSent: "أُرسلت نسخة من هذا الإقرار إلى k_hmed@yahoo.com وإلى البريد الذي أدخلته.",
+  emailNotSent: "حُفظ الإقرار، لكن نسخة البريد لم تصل بعد. افتح ياهو (بما فيه البريد غير المرغوب) واضغط تأكيد في رسالة FormSubmit، ثم أرسل اختباراً آخر.",
+  emailActivate: "أول تقرير: أكّد FormSubmit في بريد ياهو، ثم تصل التقارير التالية تلقائياً.",
 };
 
 export const DICTS: Record<Locale, Record<Msg, string>> = { en, ar };

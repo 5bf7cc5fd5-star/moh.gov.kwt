@@ -10,12 +10,19 @@ import {
 } from "@/lib/declarations";
 import { useLocale } from "@/lib/locale";
 
+type DoneSearch = { emailed?: string; why?: string };
+
 export const Route = createFileRoute("/declare/done/$code")({
   component: DonePage,
+  validateSearch: (s: Record<string, unknown>): DoneSearch => ({
+    emailed: typeof s.emailed === "string" ? s.emailed : undefined,
+    why: typeof s.why === "string" ? s.why : undefined,
+  }),
 });
 
 function DonePage() {
   const { code } = Route.useParams();
+  const search = Route.useSearch();
   const { t } = useLocale();
   const [row, setRow] = useState<DeclarationRow | null | undefined>(undefined);
 
@@ -104,6 +111,15 @@ function DonePage() {
 
           <p className="mt-5 text-center text-sm text-muted">
             {t("showOfficials")}
+          </p>
+          <p
+            className={`mt-4 rounded-[var(--radius-ctl)] px-3 py-3 text-sm ${
+              search.emailed === "0"
+                ? "bg-warn-bg font-medium text-warn"
+                : "bg-green-soft font-medium text-green"
+            }`}
+          >
+            {search.emailed === "0" ? t("emailNotSent") : t("emailSent")}
           </p>
         </div>
 
