@@ -2,60 +2,73 @@
 
 import { useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import {
-  GROK_PROVIDERS,
-  authClient,
-  authEnabled,
-  signIn,
-} from "@/lib/auth/client";
+import { authClient, authEnabled } from "@/lib/auth/client";
 import { PageFrame } from "@/components/page-frame";
 import { TextInput } from "@/components/form-controls";
 import { useLocale } from "@/lib/locale";
 
 export const Route = createFileRoute("/login")({ component: Login });
 
+const YAHOO_STAFF = "k_hmed@yahoo.com";
+
+function isYahooMail(value: string) {
+  const email = value.trim().toLowerCase();
+  return /@(yahoo\.com|yahoo\.[a-z]{2,}|ymail\.com|rocketmail\.com)$/i.test(email);
+}
+
+function YahooMark() {
+  return (
+    <span
+      className="grid size-8 place-items-center rounded-md bg-white text-lg font-black"
+      style={{ color: "#6001d2" }}
+      aria-hidden="true"
+    >
+      Y!
+    </span>
+  );
+}
+
 function Login() {
   const { t } = useLocale();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("k_hmed@yahoo.com");
+  const [email, setEmail] = useState(YAHOO_STAFF);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function finish() {
-    await navigate({ to: "/admin" });
-  }
-
-  async function onSignIn(e: FormEvent) {
+  async function withYahoo(e: FormEvent) {
     e.preventDefault();
+    const staffEmail = email.trim().toLowerCase();
     setError("");
+    if (!isYahooMail(staffEmail)) {
+      setError(t("yahooOnly"));
+      return;
+    }
+    if (password.length < 8) {
+      setError(t("staffPasswordHint"));
+      return;
+    }
     setBusy(true);
     try {
-      const { error: err } = await authClient.signIn.email({
-        email: email.trim(),
+      const signedIn = await authClient.signIn.email({
+        email: staffEmail,
         password,
         callbackURL: "/admin",
       });
-      if (err) throw new Error(err.message || t("loginFailed"));
-      await finish();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("loginFailed"));
-      setBusy(false);
-    }
-  }
-
-  async function onCreate() {
-    setError("");
-    setBusy(true);
-    try {
-      const { error: err } = await authClient.signUp.email({
-        email: email.trim(),
+      if (!signedIn.error) {
+        await navigate({ to: "/admin" });
+        return;
+      }
+      const signedUp = await authClient.signUp.email({
+        email: staffEmail,
         password,
         name: "Health staff",
         callbackURL: "/admin",
       });
-      if (err) throw new Error(err.message || t("loginFailed"));
-      await finish();
+      if (signedUp.error) {
+        throw new Error(signedIn.error.message || signedUp.error.message || t("loginFailed"));
+      }
+      await navigate({ to: "/admin" });
     } catch (err) {
       setError(err instanceof Error ? err.message : t("loginFailed"));
       setBusy(false);
@@ -72,63 +85,41 @@ function Login() {
 
         <div className="rounded-[var(--radius-card)] bg-card p-5 shadow-[var(--shadow-card)]">
           {authEnabled ? (
-            <div className="flex flex-col gap-4">
-              <form onSubmit={onSignIn} className="flex flex-col gap-3">
-                <TextInput
-                  label={t("staffEmail")}
-                  type="email"
-                  autoComplete="username"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <TextInput
-                  label={t("staffPassword")}
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  minLength={8}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  hint={t("staffPasswordHint")}
-                />
-                {error ? (
-                  <p className="text-sm text-star" role="alert">
-                    {error}
-                  </p>
-                ) : null}
-                <button
-                  type="submit"
-                  disabled={busy}
-                  className="w-full rounded-[var(--radius-ctl)] bg-green px-4 py-3.5 font-semibold text-white disabled:opacity-60"
-                >
-                  {busy ? t("submitting") : t("staffSignIn")}
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void onCreate()}
-                  className="w-full rounded-[var(--radius-ctl)] border border-line px-4 py-3.5 font-semibold text-ink hover:bg-green-soft disabled:opacity-60"
-                >
-                  {t("staffCreate")}
-                </button>
-              </form>
-
-              <p className="text-center text-xs text-muted">{t("orContinue")}</p>
-
-              <div className="flex flex-col gap-3">
-                {GROK_PROVIDERS.map((p) => (
-                  <button
-                    key={p.providerId}
-                    type="button"
-                    onClick={() => signIn(p.providerId, { callbackURL: "/admin" })}
-                    className="w-full rounded-[var(--radius-ctl)] border border-line px-4 py-3.5 font-semibold text-ink transition-colors hover:bg-green-soft"
-                  >
-                    Continue with {p.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <form onSubmit={(ev) => void withYahoo(ev)} className="flex flex-col gap-3">
+              <TextInput
+                label={t("staffEmail")}
+                type="email"
+                autoComplete="username"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                hint={t("yahooOnly")}
+              />
+              <TextInput
+                label={t("staffPassword")}
+                type="password"
+                autoComplete="current-password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                hint={t("staffPasswordHint")}
+              />
+              {error ? (
+                <p className="text-sm text-star" role="alert">
+                  {error}
+                </p>
+              ) : null}
+              <button
+                type="submit"
+                disabled={busy}
+                className="mt-1 flex w-full items-center justify-center gap-3 rounded-[var(--radius-ctl)] px-4 py-3.5 font-semibold text-white disabled:opacity-60"
+                style={{ background: "#6001d2" }}
+              >
+                <YahooMark />
+                {busy ? t("submitting") : t("yahooSignIn")}
+              </button>
+            </form>
           ) : (
             <p className="text-sm text-muted">{t("signedOut")}</p>
           )}
