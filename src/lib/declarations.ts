@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
-import { authMiddleware } from "@/lib/auth/middleware";
 import { sendDeclarationEmail } from "@/lib/report-email";
 
 export type Direction = "arrive" | "depart";
@@ -294,7 +293,6 @@ export const getDeclarationByCode = createServerFn({ method: "GET" })
   });
 
 export const searchDeclarations = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
   .validator((q: string) => q.trim())
   .handler(async ({ data: q }) => {
     const sql = await getSql();

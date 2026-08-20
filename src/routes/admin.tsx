@@ -21,13 +21,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  RedirectToSignIn,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@/lib/auth/gates";
-import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { KuwaitCrest } from "@/components/kuwait-crest";
 import { PURPOSES } from "@/lib/catalog";
 import {
@@ -73,28 +66,11 @@ function Field({ label, value }: { label: string; value: string }) {
 }
 
 function AdminPage() {
-  const { t } = useLocale();
-  const { user, isPending } = useCurrentUserState();
-
-  if (isPending) {
-    return (
-      <div className="grid min-h-dvh place-items-center text-muted">{t("submitting")}</div>
-    );
-  }
-
-  return (
-    <>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-      <SignedIn>{user ? <AdminConsole /> : null}</SignedIn>
-    </>
-  );
+  return <AdminConsole />;
 }
 
 function AdminConsole() {
   const { t } = useLocale();
-  const { user } = useCurrentUserState();
   const [q, setQ] = useState("");
   const [rows, setRows] = useState<DeclarationRow[]>([]);
   const [busy, setBusy] = useState(true);
@@ -163,7 +139,7 @@ function AdminConsole() {
 
   const list =
     tab === "followup" ? followUp : tab === "all" ? inWindow : inWindow;
-  const welcome = user?.displayName || "Kawesali Ahmed";
+  const welcome = "Kawesali Ahmed";
 
   return (
     <div className="flex min-h-dvh bg-page">
@@ -248,7 +224,7 @@ function AdminConsole() {
             </button>
           </form>
           <Bell className="hidden size-5 text-muted sm:block" />
-          <UserButton />
+          <span className="text-sm font-semibold text-ink">Kawesali Ahmed</span>
         </header>
 
         <main className="flex-1 overflow-auto p-4 sm:p-6">

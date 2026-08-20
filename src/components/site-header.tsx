@@ -103,7 +103,7 @@ export function SiteHeader() {
               |
             </span>
             <Link
-              to="/login"
+              to="/admin"
               className="font-medium text-ink no-underline hover:text-teal-deep"
             >
               {t("staffLogin")}
@@ -140,7 +140,7 @@ export function SiteHeader() {
               |
             </span>
             <Link
-              to="/login"
+              to="/admin"
               className="font-medium text-ink no-underline hover:text-teal-deep"
             >
               {t("staffLogin")}
@@ -209,7 +209,7 @@ export function SiteHeader() {
               {t("verifyTitle")}
             </Link>
             <Link
-              to="/login"
+              to="/admin"
               className="rounded-md px-3 py-3 text-white no-underline hover:bg-white/10"
               onClick={() => setOpen(false)}
             >
