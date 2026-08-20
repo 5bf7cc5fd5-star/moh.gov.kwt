@@ -91,6 +91,20 @@ export type DeclarationRow = {
   created_at: string;
 };
 
+export function parseScreening(raw: unknown): Screening | null {
+  if (!raw) return null;
+  let value: unknown = raw;
+  if (typeof raw === "string") {
+    try {
+      value = JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+  if (!value || typeof value !== "object") return null;
+  return value as Screening;
+}
+
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function chunk(n: number) {
