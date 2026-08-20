@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-page: #f4f7f8;
+  --color-card: #ffffff;
+  --color-ink: #14222a;
+  --color-muted: #5b6b73;
+  --color-line: #d5dee3;
+  --color-green: #0c3344;
+  --color-green-2: #0a2b38;
+  --color-green-hover: #16485c;
+  --color-green-soft: #e7eef1;
+  --color-gold: #c9a227;
+  --color-star: #c62828;
+  --color-yesno: #eef2f4;
+  --color-warn: #8a5a00;
+  --color-warn-bg: #fbf3d9;
+  --color-teal: #2bb3a3;
+  --color-teal-deep: #1a8f82;
+  --color-flag-green: #007a3d;
+  --color-flag-red: #ce1126;
+  --font-sans: "IBM Plex Sans", "Cairo", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Cairo", "IBM Plex Sans", system-ui, sans-serif;
+  --radius-card: 0.7rem;
+  --radius-ctl: 0.55rem;
+  --shadow-card: 0 1px 2px rgba(12, 51, 68, 0.06), 0 10px 28px rgba(12, 51, 68, 0.06);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background: var(--color-page);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html[lang="ar"] {
+    font-family: var(--font-display);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

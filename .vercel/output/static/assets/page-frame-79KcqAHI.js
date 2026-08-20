@@ -1,0 +1,1 @@
+import{l as e}from"./locale-he0W_Buy.js";import{t}from"./utils-Dk_44zMo.js";var n=e();function r({children:e,narrow:r=!0}){return(0,n.jsx)(`div`,{className:t(`mx-auto w-full flex-1 px-4 py-6`,r?`max-w-xl`:`max-w-5xl`),children:e})}export{r as t};

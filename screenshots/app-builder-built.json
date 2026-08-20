@@ -1,0 +1,40 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Ministry of Health — State of Kuwait",
+      "hasCanvas": false,
+      "bodyTextLen": 704,
+      "bodyTextHash": "da41c5e40d6c5f331379b92d8ef02284050119ba069f7ae8a909db0a54dd4b9c",
+      "bodyTextPrefix": "العربية | Staff Login وزارة الصحة Ministry of Health State of Ku",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Ministry of Health — State of Kuwait",
+      "hasCanvas": false,
+      "bodyTextLen": 704,
+      "bodyTextHash": "da41c5e40d6c5f331379b92d8ef02284050119ba069f7ae8a909db0a54dd4b9c",
+      "bodyTextPrefix": "العربية | Staff Login وزارة الصحة Ministry of Health State of Ku",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": true,
+  "baselineReasons": [
+    "desktop: body text replaced (similar length, page start changed)",
+    "mobile: body text replaced (similar length, page start changed)"
+  ]
+}
