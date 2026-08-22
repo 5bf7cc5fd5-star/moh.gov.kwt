@@ -298,8 +298,11 @@ export function DeclarationForm({ direction }: { direction: Direction }) {
           vars={{ mins: t("twoMinutes") }}
         />
       </p>
-      <p className="mb-5 text-[1.02rem] leading-relaxed text-muted">
+      <p className="mb-3 text-[1.02rem] leading-relaxed text-muted">
         {t("introHonesty")}
+      </p>
+      <p className="mb-5 text-[1.02rem] leading-relaxed text-muted">
+        {t("introPrivacy")}
       </p>
 
       <div className="flex flex-col gap-3">
@@ -793,6 +796,7 @@ export function DeclarationForm({ direction }: { direction: Direction }) {
           <FormNote>{t("sexualNote")}</FormNote>
 
           <h3 className="pt-2 text-lg font-bold text-ink">{t("stdTitle")}</h3>
+          <FormNote>{t("stdImportant")}</FormNote>
           <div data-field="stdSymptoms">
             <YesNo
               label={t("stdDischarge")}
