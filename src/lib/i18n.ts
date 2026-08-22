@@ -14,6 +14,8 @@ const en = {
     "This short form helps the Ministry of Health keep travellers and residents of Kuwait safe. It should take about {mins}. Your information is confidential.",
   introDepart:
     "This short form helps the Ministry of Health keep travellers and residents of Kuwait safe. It should take about {mins}. Your information is confidential.",
+  introHonesty:
+    "Answer these to the best of your knowledge and avoid putting false answers that can affect the medication you are to receive if you fall sick while in the country.",
   twoMinutes: "2 minutes",
   yourTrip: "Your trip",
   portEntry: "Port of entry into Kuwait",
@@ -243,6 +245,8 @@ const ar: Record<Msg, string> = {
     "يساعدنا هذا النموذج القصير في وزارة الصحة على حماية المسافرين والمقيمين في الكويت. يستغرق حوالي {mins}. معلوماتك سرية.",
   introDepart:
     "يساعدنا هذا النموذج القصير في وزارة الصحة على حماية المسافرين والمقيمين في الكويت. يستغرق حوالي {mins}. معلوماتك سرية.",
+  introHonesty:
+    "أجب وفق أفضل ما تعرفه، وتجنب وضع إجابات غير صحيحة لأنها قد تؤثر على الدواء الذي تتلقاه إذا مرضت أثناء وجودك في البلاد.",
   twoMinutes: "دقيقتين",
   yourTrip: "رحلتك",
   portEntry: "منفذ الدخول إلى الكويت",

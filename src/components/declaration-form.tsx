@@ -292,11 +292,14 @@ export function DeclarationForm({ direction }: { direction: Direction }) {
       <h1 className="mb-2 text-[1.85rem] font-extrabold leading-tight tracking-tight text-ink">
         {arrive ? t("beforeArrive") : t("beforeDepart")}
       </h1>
-      <p className="mb-5 text-[1.02rem] leading-relaxed text-muted">
+      <p className="mb-3 text-[1.02rem] leading-relaxed text-muted">
         <Rich
           template={t(introKey, { mins: "{mins}" })}
           vars={{ mins: t("twoMinutes") }}
         />
+      </p>
+      <p className="mb-5 text-[1.02rem] leading-relaxed text-muted">
+        {t("introHonesty")}
       </p>
 
       <div className="flex flex-col gap-3">
