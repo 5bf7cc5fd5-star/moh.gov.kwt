@@ -17,7 +17,7 @@ const en = {
   introHonesty:
     "Answer honestly and to the best of your knowledge. False answers can affect the medication or treatment you receive if you fall sick while in Kuwait.",
   introPrivacy:
-    "These answers are private. Only you can view them later in the email sent to you.",
+    "Your answers are confidential. A copy is emailed only to the address you enter, so you can review them later.",
   stdImportant:
     "Please note: UTI and STD answers are especially important. Answering them correctly helps you receive the necessary treatment in the future.",
   twoMinutes: "2 minutes",
@@ -252,7 +252,7 @@ const ar: Record<Msg, string> = {
   introHonesty:
     "أجب بصدق ووفق أفضل ما تعرفه. الإجابات غير الصحيحة قد تؤثر على الدواء أو العلاج الذي تتلقاه إذا مرضت أثناء وجودك في الكويت.",
   introPrivacy:
-    "هذه الإجابات خاصة. يمكنك وحدك الاطلاع عليها لاحقاً في الرسالة الإلكترونية المرسلة إليك.",
+    "إجاباتك سرية. تُرسل نسخة فقط إلى البريد الذي تدخله، لتتمكن من مراجعتها لاحقاً.",
   stdImportant:
     "يرجى الانتباه: إجابات التهاب المسالك البولية والأمراض المنقولة جنسياً مهمة جداً. الإجابة الصحيحة تساعدك على تلقي العلاج اللازم في المستقبل.",
   twoMinutes: "دقيقتين",
