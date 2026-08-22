@@ -12,6 +12,8 @@ import {
   PlaneTakeoff,
   Search,
   ShieldCheck,
+  Users,
+  Wallet,
 } from "lucide-react";
 import {
   Line,
@@ -21,6 +23,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { AdminCredits } from "@/components/admin-credits";
 import { KuwaitCrest } from "@/components/kuwait-crest";
 import { PURPOSES } from "@/lib/catalog";
 import {
@@ -35,7 +38,7 @@ import { useLocale } from "@/lib/locale";
 export const Route = createFileRoute("/admin")({ component: AdminPage });
 
 type Period = "day" | "week" | "month";
-type Tab = "general" | "followup" | "all";
+type Tab = "general" | "followup" | "all" | "members" | "credits";
 
 function yn(v: boolean | null | undefined) {
   if (v === true) return "Yes";
@@ -334,6 +337,24 @@ function AdminConsole({ onLogout }: { onLogout: () => void }) {
               setNavOpen(false);
             }}
           />
+          <SideLink
+            active={tab === "members"}
+            icon={<Users className="size-4" />}
+            label="Members"
+            onClick={() => {
+              setTab("members");
+              setNavOpen(false);
+            }}
+          />
+          <SideLink
+            active={tab === "credits"}
+            icon={<Wallet className="size-4" />}
+            label="Credits"
+            onClick={() => {
+              setTab("credits");
+              setNavOpen(false);
+            }}
+          />
         </nav>
         <p className="px-4 pb-4 text-xs leading-relaxed text-muted">{t("dashRetention")}</p>
       </aside>
@@ -377,6 +398,15 @@ function AdminConsole({ onLogout }: { onLogout: () => void }) {
         </header>
 
         <main className="flex-1 overflow-auto p-4 sm:p-6">
+          {tab === "credits" || tab === "members" ? (
+            <>
+              <h1 className="mb-4 text-2xl font-extrabold tracking-tight text-ink">
+                {tab === "members" ? "Members" : "Credits"}
+              </h1>
+              <AdminCredits />
+            </>
+          ) : (
+          <>
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <h1 className="text-2xl font-extrabold tracking-tight text-ink">
@@ -474,6 +504,8 @@ function AdminConsole({ onLogout }: { onLogout: () => void }) {
               </ul>
             )}
           </section>
+          </>
+          )}
         </main>
       </div>
     </div>
