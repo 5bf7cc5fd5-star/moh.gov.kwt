@@ -109,13 +109,22 @@ async function createPgliteSql(): Promise<Sql> {
   // data survives source edits (it resets on dev-server restart).
   globalRef.__pgliteInstance__ ??= (async () => {
     const { PGlite } = await import("@electric-sql/pglite");
-    const pg = new PGlite({
-      parsers: {
-        [OID_INT8]: Number,
-        [OID_DATE]: identity,
-        [OID_INTERVAL]: identity,
-      },
-    });
+    const parsers = {
+      [OID_INT8]: Number,
+      [OID_DATE]: identity,
+      [OID_INTERVAL]: identity,
+    };
+    let pg: import("@electric-sql/pglite").PGlite;
+    try {
+      const { mkdir } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+      const dir = join(process.cwd(), "data", "pglite");
+      await mkdir(dir, { recursive: true });
+      pg = new PGlite({ dataDir: dir, parsers });
+    } catch (err) {
+      console.warn("[db] disk PGLite unavailable, using memory:", err);
+      pg = new PGlite({ parsers });
+    }
     await pg.waitReady;
     await pg.exec(
       "create table if not exists _migrations (name text primary key, applied_at timestamptz not null default now())",

@@ -229,6 +229,7 @@ export const submitDeclaration = createServerFn({ method: "POST" })
   .validator((raw: DeclarationInput) => validateInput(raw))
   .handler(async ({ data }) => {
     const sql = await getSql();
+    await ensureBackupRestored(sql);
     const riskFlag = riskFrom(data);
 
     let code = makeCode();
@@ -260,6 +261,15 @@ export const submitDeclaration = createServerFn({ method: "POST" })
             ${data.locale}
           )
         `;
+        const saved = await sql<DeclarationRow>`
+          select * from declarations where id = ${id} limit 1
+        `;
+        if (saved[0]) {
+          const { appendDeclarationBackup } = await import(
+            "@/lib/declaration-backup.server"
+          );
+          await appendDeclarationBackup(saved[0]);
+        }
         await purgeExpired(sql);
         const emailed = await sendDeclarationEmail(code, riskFlag, data);
         return { code, riskFlag, emailed };
@@ -278,6 +288,16 @@ export const submitDeclaration = createServerFn({ method: "POST" })
 
 export const RETENTION_DAYS = 21;
 
+let restored = false;
+async function ensureBackupRestored(sql: Awaited<ReturnType<typeof getSql>>) {
+  if (restored) return;
+  restored = true;
+  const { restoreDeclarationsFromBackup } = await import(
+    "@/lib/declaration-backup.server"
+  );
+  await restoreDeclarationsFromBackup(sql);
+}
+
 async function purgeExpired(sql: Awaited<ReturnType<typeof getSql>>) {
   await sql`delete from declarations where created_at < now() - interval '21 days'`;
 }
@@ -286,6 +306,7 @@ export const getDeclarationByCode = createServerFn({ method: "GET" })
   .validator((code: string) => code.trim().toUpperCase())
   .handler(async ({ data: code }) => {
     const sql = await getSql();
+    await ensureBackupRestored(sql);
     const rows = await sql<DeclarationRow>`
       select * from declarations where code = ${code} limit 1
     `;
@@ -296,6 +317,7 @@ export const searchDeclarations = createServerFn({ method: "GET" })
   .validator((q: string) => q.trim())
   .handler(async ({ data: q }) => {
     const sql = await getSql();
+    await ensureBackupRestored(sql);
     await purgeExpired(sql);
     if (!q) {
       return sql<DeclarationRow>`
