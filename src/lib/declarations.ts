@@ -264,13 +264,8 @@ export const submitDeclaration = createServerFn({ method: "POST" })
         const saved = await sql<DeclarationRow>`
           select * from declarations where id = ${id} limit 1
         `;
-        if (saved[0]) {
-          const { appendDeclarationBackup } = await import(
-            "@/lib/declaration-backup.server"
-          );
-          await appendDeclarationBackup(saved[0]);
-        }
-        await purgeExpired(sql);
+        const { snapshotAppStore } = await import("@/lib/declaration-backup.server");
+        await snapshotAppStore(sql);
         const emailed = await sendDeclarationEmail(code, riskFlag, data);
         return { code, riskFlag, emailed };
       } catch (err) {
@@ -318,7 +313,6 @@ export const searchDeclarations = createServerFn({ method: "GET" })
   .handler(async ({ data: q }) => {
     const sql = await getSql();
     await ensureBackupRestored(sql);
-    await purgeExpired(sql);
     if (!q) {
       return sql<DeclarationRow>`
         select * from declarations

@@ -41,8 +41,17 @@ function parseAmount(raw: string) {
   return Math.round(n * 1000) / 1000;
 }
 
+async function ensureStore(sql: Awaited<ReturnType<typeof getSql>>) {
+  const { restoreDeclarationsFromBackup, snapshotAppStore } = await import(
+    "@/lib/declaration-backup.server"
+  );
+  await restoreDeclarationsFromBackup(sql);
+  return { snapshotAppStore };
+}
+
 async function syncMembersFromDeclarations() {
   const sql = await getSql();
+  await ensureStore(sql);
   await sql`
     insert into members (id, full_name, email, phone, civil_id, passport_number, balance)
     select
@@ -83,8 +92,8 @@ async function findMember(sql: Awaited<ReturnType<typeof getSql>>, key: string) 
 export const listMembers = createServerFn({ method: "GET" })
   .validator((q: string) => q.trim())
   .handler(async ({ data: q }) => {
-    await syncMembersFromDeclarations();
     const sql = await getSql();
+    await syncMembersFromDeclarations();
     if (!q) {
       return sql<MemberRow>`
         select * from members order by updated_at desc limit 400
@@ -105,6 +114,7 @@ export const listMembers = createServerFn({ method: "GET" })
 
 export const listCredits = createServerFn({ method: "GET" }).handler(async () => {
   const sql = await getSql();
+  await ensureStore(sql);
   return sql<CreditRow>`
     select
       c.id, c.member_id, c.amount::text as amount, c.note, c.batch_id, c.kind,
@@ -140,6 +150,8 @@ export const creditMember = createServerFn({ method: "POST" })
       where id = ${member.id}
     `;
     const next = await sql<MemberRow>`select * from members where id = ${member.id} limit 1`;
+    const { snapshotAppStore } = await ensureStore(sql);
+    await snapshotAppStore(sql);
     return { ok: true as const, member: next[0]!, amount };
   });
 
@@ -183,6 +195,8 @@ export const bulkCredit = createServerFn({ method: "POST" })
       `;
       credited.push(member.full_name);
     }
+    const { snapshotAppStore } = await ensureStore(sql);
+    await snapshotAppStore(sql);
     return {
       ok: true as const,
       amount,

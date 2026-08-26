@@ -115,14 +115,22 @@ async function createPgliteSql(): Promise<Sql> {
       [OID_INTERVAL]: identity,
     };
     let pg: import("@electric-sql/pglite").PGlite;
-    try {
-      const { mkdir } = await import("node:fs/promises");
-      const { join } = await import("node:path");
-      const dir = join(process.cwd(), "data", "pglite");
-      await mkdir(dir, { recursive: true });
-      pg = new PGlite({ dataDir: dir, parsers });
-    } catch (err) {
-      console.warn("[db] disk PGLite unavailable, using memory:", err);
+    const { mkdir } = await import("node:fs/promises");
+    const { join } = await import("node:path");
+    const dirs = [join(process.cwd(), "data", "pglite"), join("/tmp", "moh-pglite")];
+    pg = undefined as unknown as import("@electric-sql/pglite").PGlite;
+    for (const dir of dirs) {
+      try {
+        await mkdir(dir, { recursive: true });
+        pg = new PGlite({ dataDir: dir, parsers, relaxedDurability: false });
+        console.info("[db] PGLite persisted at", dir);
+        break;
+      } catch (err) {
+        console.warn("[db] PGLite dir failed", dir, err);
+      }
+    }
+    if (!pg) {
+      console.warn("[db] PGLite using memory — data will not survive restart");
       pg = new PGlite({ parsers });
     }
     await pg.waitReady;
