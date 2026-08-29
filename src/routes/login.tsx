@@ -1,8 +1,4 @@
-"use client";
-
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminPage } from "./admin";
+import { ShutdownPage } from "@/components/shutdown-page";
 
-export const Route = createFileRoute("/login")({
-  component: AdminPage,
-});
+export const Route = createFileRoute("/login")({ component: ShutdownPage });

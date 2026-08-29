@@ -6,7 +6,7 @@ import { LocaleProvider } from "@/lib/locale";
 import { publicShareHost } from "@/lib/og/public-host";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Ministry of Health — State of Kuwait";
+const APP_NAME = "Service closed";
 
 export const Route = createRootRoute({
   head: () => {
@@ -21,7 +21,7 @@ export const Route = createRootRoute({
         {
           name: "description",
           content:
-            "State of Kuwait Ministry of Health e-services and traveller health declaration.",
+            "This website has been permanently shut down.",
         },
         ...(xBanner
           ? [{ property: "x:game:image", content: xBanner }]

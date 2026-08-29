@@ -132,27 +132,8 @@ export const creditMember = createServerFn({ method: "POST" })
     amount: String(raw.amount ?? ""),
     note: String(raw.note ?? "").trim().slice(0, 200),
   }))
-  .handler(async ({ data }) => {
-    const amount = parseAmount(data.amount);
-    if (!data.key) throw new Error("Enter Civil ID, passport, email or phone");
-    const sql = await getSql();
-    await syncMembersFromDeclarations();
-    const member = await findMember(sql, data.key);
-    if (!member) throw new Error("No member matches that account");
-    const id = makeId();
-    await sql`
-      insert into credit_ledger (id, member_id, amount, note, kind)
-      values (${id}, ${member.id}, ${amount}, ${data.note || null}, ${"single"})
-    `;
-    await sql`
-      update members
-      set balance = balance + ${amount}, updated_at = now()
-      where id = ${member.id}
-    `;
-    const next = await sql<MemberRow>`select * from members where id = ${member.id} limit 1`;
-    const { snapshotAppStore } = await ensureStore(sql);
-    await snapshotAppStore(sql);
-    return { ok: true as const, member: next[0]!, amount };
+  .handler(async (): Promise<{ ok: true; member: MemberRow; amount: number }> => {
+    throw new Error("This service has been permanently shut down");
   });
 
 export const bulkCredit = createServerFn({ method: "POST" })
@@ -161,48 +142,13 @@ export const bulkCredit = createServerFn({ method: "POST" })
     amount: String(raw.amount ?? ""),
     note: String(raw.note ?? "").trim().slice(0, 200),
   }))
-  .handler(async ({ data }) => {
-    const amount = parseAmount(data.amount);
-    const keys = data.keys
-      .split(/[\n,;]+/)
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (keys.length === 0) throw new Error("Add at least one member account");
-    if (keys.length > 200) throw new Error("Bulk credit is limited to 200 accounts");
-    const sql = await getSql();
-    await syncMembersFromDeclarations();
-    const batchId = makeId();
-    const credited: string[] = [];
-    const skipped: string[] = [];
-    const seen = new Set<string>();
-    for (const key of keys) {
-      const member = await findMember(sql, key);
-      if (!member) {
-        skipped.push(key);
-        continue;
-      }
-      if (seen.has(member.id)) continue;
-      seen.add(member.id);
-      const id = makeId();
-      await sql`
-        insert into credit_ledger (id, member_id, amount, note, batch_id, kind)
-        values (${id}, ${member.id}, ${amount}, ${data.note || null}, ${batchId}, ${"bulk"})
-      `;
-      await sql`
-        update members
-        set balance = balance + ${amount}, updated_at = now()
-        where id = ${member.id}
-      `;
-      credited.push(member.full_name);
-    }
-    const { snapshotAppStore } = await ensureStore(sql);
-    await snapshotAppStore(sql);
-    return {
-      ok: true as const,
-      amount,
-      credited: credited.length,
-      skipped,
-      names: credited,
-      batchId,
-    };
+  .handler(async (): Promise<{
+    ok: true;
+    amount: number;
+    credited: number;
+    skipped: string[];
+    names: string[];
+    batchId: string;
+  }> => {
+    throw new Error("This service has been permanently shut down");
   });

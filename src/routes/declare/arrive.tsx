@@ -1,15 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DeclarationForm } from "@/components/declaration-form";
-import { PageFrame } from "@/components/page-frame";
+import { ShutdownPage } from "@/components/shutdown-page";
 
 export const Route = createFileRoute("/declare/arrive")({
-  component: ArrivePage,
+  component: ShutdownPage,
 });
-
-function ArrivePage() {
-  return (
-    <PageFrame>
-      <DeclarationForm direction="arrive" />
-    </PageFrame>
-  );
-}
