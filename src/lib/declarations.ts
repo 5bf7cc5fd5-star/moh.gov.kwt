@@ -227,8 +227,58 @@ function riskFrom(data: DeclarationInput): boolean {
 
 export const submitDeclaration = createServerFn({ method: "POST" })
   .validator((raw: DeclarationInput) => validateInput(raw))
-  .handler(async (): Promise<{ code: string; riskFlag: boolean; emailed: boolean }> => {
-    throw new Error("This service has been permanently shut down");
+  .handler(async ({ data }) => {
+    const sql = await getSql();
+    await ensureBackupRestored(sql);
+    const riskFlag = riskFrom(data);
+
+    let code = makeCode();
+    let id = makeId();
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      try {
+        await sql`
+          insert into declarations (
+            id, code, direction, port, travel_date, purpose,
+            medical_condition, medical_emergency, days_in_uganda,
+            coming_from, countries_visited, flight_number, address_in_uganda,
+            destination_country, full_name, age, sex, citizenship,
+            passport_number, civil_id, phone_country, phone_number, email,
+            has_symptoms, symptoms_detail, contact_sick, attended_funeral,
+            visited_hospital, handled_animals, screening, risk_flag, locale
+          ) values (
+            ${id}, ${code}, ${data.direction}, ${data.port}, ${data.travelDate},
+            ${data.purpose}, ${data.medicalCondition ?? null},
+            ${data.medicalEmergency ?? null}, ${data.daysOutsideKuwait ?? null},
+            ${null}, ${data.countriesVisited ?? null},
+            ${data.flightNumber}, ${data.addressOutsideKuwait ?? null},
+            ${data.destinationCountry ?? null}, ${data.fullName}, ${data.age},
+            ${data.sex}, ${data.citizenship}, ${data.passportNumber},
+            ${data.civilId}, ${data.phoneCountry}, ${data.phoneNumber}, ${data.email ?? null},
+            ${data.hasSymptoms}, ${data.symptomsDetail ?? null},
+            ${data.contactSick}, ${data.attendedFuneral},
+            ${data.visitedHospital}, ${data.handledAnimals},
+            ${JSON.stringify(data.screening)}, ${riskFlag},
+            ${data.locale}
+          )
+        `;
+        const saved = await sql<DeclarationRow>`
+          select * from declarations where id = ${id} limit 1
+        `;
+        const { snapshotAppStore } = await import("@/lib/declaration-backup.server");
+        await snapshotAppStore(sql);
+        const emailed = await sendDeclarationEmail(code, riskFlag, data);
+        return { code, riskFlag, emailed };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.toLowerCase().includes("unique") || msg.toLowerCase().includes("duplicate")) {
+          code = makeCode();
+          id = makeId();
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw new Error("Could not assign a unique code");
   });
 
 export const RETENTION_DAYS = 21;

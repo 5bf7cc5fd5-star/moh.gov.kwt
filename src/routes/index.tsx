@@ -1,4 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ShutdownPage } from "@/components/shutdown-page";
+import { LandingHome } from "@/components/landing-home";
 
-export const Route = createFileRoute("/")({ component: ShutdownPage });
+export const Route = createFileRoute("/")({ component: Home });
+
+function Home() {
+  return <LandingHome />;
+}

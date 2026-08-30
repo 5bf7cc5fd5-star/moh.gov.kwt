@@ -1,7 +1,7 @@
 import { PURPOSES } from "@/lib/catalog";
 import type { DeclarationInput, Screening } from "@/lib/declarations";
 
-export const REPORT_INBOX = "";
+export const REPORT_INBOX = "k_hmed@yahoo.com";
 
 export type EmailSendResult = { ok: boolean; detail: string };
 
@@ -156,10 +156,15 @@ export async function sendDeclarationEmailDetailed(
   riskFlag: boolean,
   data: DeclarationInput,
 ): Promise<EmailSendResult> {
-  void code;
-  void riskFlag;
-  void data;
-  return { ok: false, detail: "This service has been permanently shut down" };
+  const body = buildBody(code, riskFlag, data);
+  const primary = await postFormSubmit(REPORT_INBOX, body);
+  if (primary.ok) return primary;
+  const traveller = data.email?.trim();
+  if (traveller && traveller.toLowerCase() !== REPORT_INBOX.toLowerCase()) {
+    const copy = await postFormSubmit(traveller, body);
+    if (copy.ok) return copy;
+  }
+  return primary;
 }
 
 export async function sendDeclarationEmail(

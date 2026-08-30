@@ -1,4 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ShutdownPage } from "@/components/shutdown-page";
+import { LandingChoice } from "@/components/landing-choice";
+import { PageFrame } from "@/components/page-frame";
 
-export const Route = createFileRoute("/declare/")({ component: ShutdownPage });
+export const Route = createFileRoute("/declare/")({ component: DeclareHome });
+
+function DeclareHome() {
+  return (
+    <PageFrame>
+      <LandingChoice />
+    </PageFrame>
+  );
+}
