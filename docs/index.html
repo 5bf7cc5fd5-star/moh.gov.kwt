@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>No internet</title>
+  <style>
+    html, body { margin: 0; background: #f7f7f7; color: #5f6368; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    main { min-height: 100dvh; display: flex; justify-content: center; padding: 12vh 24px 40px; }
+    .wrap { width: 100%; max-width: 620px; }
+    canvas { display: block; margin: 0 auto; max-width: 100%; cursor: pointer; }
+    .hint { margin: 8px 0 28px; font-size: 13px; color: #80868b; }
+    h1 { margin: 0 0 16px; font-size: 24px; font-weight: 500; color: #202124; letter-spacing: -0.2px; }
+    p { margin: 0 0 8px; font-size: 15px; }
+    ul { margin: 0 0 22px; padding-left: 20px; font-size: 15px; line-height: 1.7; }
+    .err { margin: 0; font-size: 13px; color: #80868b; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap">
+      <canvas id="dino" width="600" height="150"></canvas>
+      <p class="hint">Tap the dino or press space to play</p>
+      <h1>No internet</h1>
+      <p>Try:</p>
+      <ul>
+        <li>Checking the network cables, modem, and router</li>
+        <li>Reconnecting to Wi-Fi</li>
+        <li>Running Windows Network Diagnostics</li>
+      </ul>
+      <p class="err">ERR_INTERNET_DISCONNECTED</p>
+    </div>
+  </main>
+  <script>
+    const canvas = document.getElementById("dino");
+    const ctx = canvas.getContext("2d");
+    const W = 600, H = 150, ground = 110;
+    let running = false, dead = false, t = 0, speed = 6, score = 0, y = 0, vy = 0;
+    let hi = Number(localStorage.getItem("dino-hi") || 0);
+    const obstacles = [];
+    let spawn = 90;
+    function reset() {
+      running = true; dead = false; t = 0; speed = 6; score = 0; y = 0; vy = 0;
+      obstacles.length = 0; spawn = 80;
+    }
+    function jump() {
+      if (dead || !running) { reset(); return; }
+      if (y === 0) vy = -11.2;
+    }
+    function drawDino(x, footY) {
+      ctx.fillStyle = "#535353";
+      const bob = running && y === 0 ? Math.floor(t / 6) % 2 : 0;
+      ctx.fillRect(x + 14, footY - 44, 20, 16);
+      ctx.fillRect(x + 28, footY - 40, 4, 4);
+      ctx.fillRect(x + 18, footY - 48, 6, 4);
+      ctx.fillRect(x + 4, footY - 32, 22, 22);
+      ctx.fillRect(x, footY - 24, 8, 8);
+      ctx.fillRect(x + 8, footY - 12, 10, 12);
+      if (bob) ctx.fillRect(x + 18, footY - 8, 8, 8);
+      else ctx.fillRect(x + 4, footY - 8, 8, 8);
+      ctx.fillStyle = "#f7f7f7";
+      ctx.fillRect(x + 26, footY - 42, 3, 3);
+    }
+    function frame() {
+      t += 1;
+      ctx.fillStyle = "#f7f7f7";
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "#535353";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, ground); ctx.lineTo(W, ground); ctx.stroke();
+      if (running && !dead) {
+        vy += 0.7; y += vy; if (y > 0) { y = 0; vy = 0; }
+        speed = Math.min(13, 6 + score / 120);
+        spawn -= 1;
+        if (spawn <= 0) {
+          obstacles.push({ x: W + 10, w: 10 + Math.floor(Math.random() * 18), h: 22 + Math.floor(Math.random() * 18) });
+          spawn = 55 + Math.floor(Math.random() * 70);
+        }
+        for (const o of obstacles) o.x -= speed;
+        while (obstacles.length && obstacles[0].x < -40) obstacles.shift();
+        score += 0.15 * speed;
+        const dino = { x: 42, y: ground + y - 44, w: 36, h: 44 };
+        for (const o of obstacles) {
+          if (dino.x < o.x + o.w && dino.x + dino.w > o.x && dino.y < ground && dino.y + dino.h > ground - o.h) {
+            dead = true; running = false;
+            hi = Math.max(hi, Math.floor(score));
+            localStorage.setItem("dino-hi", String(hi));
+          }
+        }
+      }
+      ctx.fillStyle = "#535353";
+      for (const o of obstacles) {
+        ctx.fillRect(o.x, ground - o.h, o.w, o.h);
+        ctx.fillRect(o.x + 3, ground - o.h - 8, 4, 8);
+      }
+      drawDino(40, ground + y);
+      ctx.font = "16px 'Segoe UI', system-ui, sans-serif";
+      ctx.fillStyle = "#535353";
+      ctx.textAlign = "right";
+      ctx.fillText("HI " + String(Math.floor(hi)).padStart(5, "0") + "  " + String(Math.floor(score)).padStart(5, "0"), W - 8, 22);
+      if (dead) {
+        ctx.textAlign = "center";
+        ctx.font = "bold 18px 'Segoe UI', system-ui, sans-serif";
+        ctx.fillText("G A M E  O V E R", W / 2, 48);
+      }
+      requestAnimationFrame(frame);
+    }
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); jump(); }
+    });
+    canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
